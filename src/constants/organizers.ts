@@ -1,0 +1,19 @@
+export const ORGANIZERS = [
+  'Pau',
+  'Enric',
+  'Xènia',
+  'Flor',
+  'Berta',
+  'Núria',
+  'Marc',
+  'Jordi',
+  'Vladi',
+  'Ona',
+  'Xavier',
+  'Gastón',
+  'Pia',
+  'Laia',
+  'Cèlia',
+  'Ricard',
+  'Victor'
+];

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>RefreshFlow - Swim Tracker</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#b3ebff",
+                        "surface-bright": "#f7f9fb",
+                        "surface-tint": "#006399",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#cde5ff",
+                        "outline-variant": "#bfc7d1",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#f3f7ff",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#58d6f1",
+                        "on-primary-fixed": "#001d32",
+                        "inverse-surface": "#2d3133",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f2f4f6",
+                        "on-tertiary-container": "#ecf9ff",
+                        "primary-container": "#0077b6",
+                        "on-surface-variant": "#404850",
+                        "secondary": "#006878",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#94ccff",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container": "#eceef0",
+                        "on-primary-fixed-variant": "#004b74",
+                        "background": "#f7f9fb",
+                        "outline": "#707881",
+                        "on-surface": "#191c1e",
+                        "on-secondary-fixed-variant": "#004e5b",
+                        "on-secondary-fixed": "#001f25",
+                        "tertiary": "#006176",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-fixed": "#001f27",
+                        "on-background": "#191c1e",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-secondary-container": "#006575",
+                        "tertiary-container": "#007c95",
+                        "primary": "#005d90",
+                        "secondary-fixed": "#a7edff",
+                        "inverse-primary": "#94ccff",
+                        "tertiary-fixed-dim": "#4cd6fb",
+                        "on-tertiary-fixed-variant": "#004e5f",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-container": "#69e5ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "xl": "48px",
+                        "sm": "16px",
+                        "lg": "32px",
+                        "container-margin": "20px",
+                        "base": "4px",
+                        "md": "24px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "h2": ["Lexend"],
+                        "h1": ["Lexend"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "label-md": ["Lexend"],
+                        "display": ["Lexend"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Lexend"],
+                        "h3": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "h2": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "h1": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "display": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+                        "h3": ["20px", { "lineHeight": "28px", "fontWeight": "500" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .underwater-shadow {
+            box-shadow: 0 10px 30px -5px rgba(0, 119, 182, 0.08);
+        }
+
+        .waterline-accent {
+            border-left: 4px solid #0077b6;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        .waterline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 15%;
+            bottom: 15%;
+            width: 4px;
+            background: #0077b6;
+            border-radius: 0 4px 4px 0;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #cde5ff;
+            border-radius: 3px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #005d90;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -7px;
+            box-shadow: 0 2px 4px rgba(0, 93, 144, 0.3);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-background font-body-md min-h-screen">
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+    <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // --- Mock Data ---
+        const BEACHES = [
+            { id: 1, name: 'Esapi de Mar', temp: '21°C', waves: '0.5m - 0.8m', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDH5Q2tzBZtAYEtKlOs-INA35dpNRbdibntkdW51ycieJFxjPHSitcZAEIdeNoqNO_g2pjP3LlvTCp5TVDN2kMR6U-r4Y2aDLlrox90Z3_eI9-uHU6AkxJllHBctYwd7_NJIpH_5tJCAuIrR7VWYpKmlxcie2Gc9Yf6TYzsL5eN28K4TvNhBk9UrWV8a1vtF08JBGPuysSoLvG9N5PaurRklKM9tjFQtP9g6TeiOO8jeXm5CPNQ9hmJ_EfdpKWU45LLlc08kv7XRcc-' },
+            { id: 2, name: 'Bogatell', temp: '18°C', waves: '1.2m - 1.5m', img: 'https://lh3.googleusercontent.com/gps-cs-s/APNQkAF-zl5jfiY5GCpQb8SZfGNgQuXvyGK1QZ99kIaX9JheSZdD4yKz-xeupOUwsunA9dTJ38r9mKM3R8OA3aPC2cZUXidzQj6ZSZNs2kqgPYSNoQm1ldvsB-ZxPx4dpOWbM3YnxpCX=w203-h114-k-no' },
+            { id: 3, name: 'Sant Sebastia', temp: '26°C', waves: 'Piscina / Calma', img: 'https://lh3.googleusercontent.com/gps-cs-s/APNQkAEpZEgzI__s72imR-7emNdtJ-4TZ7p20Z9xRsKSxFsrfja95rz8HXwvU24A_Bb_q9IGgZ67EYlVro1-m3Uw4fIgiLxZOc951TacEr-x8sFjb0E63LXm6CROFjpNvDEOQQ_WOtE=w408-h306-k-no' }
+        ];
+
+        // --- Shared Components ---
+
+        const TopAppBar = ({ title, showBack }) => {
+            const navigate = useNavigate();
+            return (
+                <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-[12px] border-b border-sky-100/20 dark:border-sky-900/20 shadow-sm docked full-width top-0 sticky z-50">
+                    <div className="flex justify-between items-center w-full px-6 h-16">
+                        <div className="flex items-center gap-4">
+                            {showBack && (
+                                <button onClick={() => navigate(-1)} className="active:scale-95 duration-200 ease-in-out p-2 rounded-full hover:bg-sky-50/50 transition-colors">
+                                    <span className="material-symbols-outlined text-sky-700 dark:text-sky-400">arrow_back</span>
+                                </button>
+                            )}
+                            <div className="flex items-center gap-3">
+                                <span className="material-symbols-outlined text-sky-700 dark:text-sky-400">waves</span>
+                                <h1 className="font-lexend tracking-tight text-xl font-bold text-sky-700 dark:text-sky-400">
+                                    {title || "RefreshFlow"}
+                                </h1>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <div className="hidden md:flex gap-6 mr-6">
+                                <Link to="/" className="text-sky-700 dark:text-sky-400 font-semibold font-label-md">Spots</Link>
+                                <Link to="/config" className="text-slate-500 dark:text-slate-400 font-label-md hover:bg-sky-50 dark:hover:bg-sky-900/30 transition-colors px-2 py-1 rounded-lg">Sessions</Link>
+                            </div>
+                            <div className="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden border-2 border-white shadow-sm">
+                                <img alt="User avatar" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyCeBeb5pt5OmESWQAIE8aKnLEBblCAK_sAtAK4ldb88nA6dziZAlWC7m7Lc0qlb8bPEJSfLbBrcjzI20yzBIUoxdcalE5SX2oGTbccB9L87RxULIME-Axbda1GtMojjkNYj70dNlz0UMOJKow8wKk1z9jRs0vH0DTBUC5zUoM-ksxB7FiWeUMjWIgi_QRDPjge7Qo3JY1DsNqz2qQK3MXBS2_vJ8u-kq_UZdI_NSNC2Qvsi1oyDCKLmK0kSMiiBbpKu9HR1RfOpUT" />
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            );
+        };
+
+        const BottomNav = () => {
+            const location = useLocation();
+            const isPlayas = location.pathname === '/';
+            return (
+                <nav className="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-[12px] border-t border-sky-100/20 dark:border-sky-900/20 shadow-[0_-4px_12px_rgba(0,119,182,0.08)] z-50 md:hidden">
+                    <div className="flex justify-around items-center px-4 py-3 pb-safe">
+                        <Link to="/" className={`flex flex-col items-center justify-center rounded-2xl px-8 py-2 active:scale-90 transition-all duration-150 ${isPlayas ? 'bg-sky-100/50 dark:bg-sky-900/40 text-sky-800 dark:text-sky-200' : 'text-slate-400 dark:text-slate-500'}`}>
+                            <span className="material-symbols-outlined">explore</span>
+                            <span className="font-lexend text-[12px] font-medium">Playas</span>
+                        </Link>
+                        <Link to="/config" className={`flex flex-col items-center justify-center rounded-2xl px-8 py-2 active:scale-90 transition-all duration-150 ${!isPlayas ? 'bg-sky-100/50 dark:bg-sky-900/40 text-sky-800 dark:text-sky-200' : 'text-slate-400 dark:text-slate-500'}`}>
+                            <span className="material-symbols-outlined">water_drop</span>
+                            <span className="font-lexend text-[12px] font-medium">Entrenos</span>
+                        </Link>
+                    </div>
+                </nav>
+            );
+        };
+
+        const ForecastModal = ({ isOpen, beach, onClose }) => {
+            if (!isOpen || !beach) return null;
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-on-surface/40 backdrop-blur-sm" onClick={onClose}></div>
+                    <div className="glass-card relative w-full max-w-lg bg-surface-container-lowest rounded-[32px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 border border-white/20">
+                        <div className="p-lg flex items-center justify-between border-b border-sky-100">
+                            <div>
+                                <h2 className="font-h2 text-primary">{beach.name} Info</h2>
+                                <p className="text-body-sm text-outline">Condiciones actuales y pronóstico</p>
+                            </div>
+                            <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high text-primary hover:bg-sky-50 transition-colors">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="p-lg space-y-md">
+                            <div className="grid grid-cols-2 gap-md">
+                                <div className="bg-surface-container-low p-md rounded-2xl border border-sky-50">
+                                    <div className="flex items-center gap-2 text-secondary mb-2">
+                                        <span className="material-symbols-outlined">waves</span>
+                                        <span className="font-label-md">Oleaje</span>
+                                    </div>
+                                    <p className="font-h3 text-on-surface font-bold">{beach.waves}</p>
+                                </div>
+                                <div className="bg-surface-container-low p-md rounded-2xl border border-sky-50">
+                                    <div className="flex items-center gap-2 text-secondary mb-2">
+                                        <span className="material-symbols-outlined">device_thermostat</span>
+                                        <span className="font-label-md">Temperatura</span>
+                                    </div>
+                                    <p className="font-h3 text-on-surface font-bold">{beach.temp}</p>
+                                </div>
+                            </div>
+                            <div className="space-y-sm">
+                                <h4 className="font-label-md text-outline px-1">Pronóstico próximas horas</h4>
+                                <div className="flex justify-between bg-surface-container-high/30 p-md rounded-2xl">
+                                    <div className="text-center"><p className="text-label-sm text-outline">12:00</p><p className="font-bold text-primary">0.8m</p></div>
+                                    <div className="text-center"><p className="text-label-sm text-outline">15:00</p><p className="font-bold text-primary">1.1m</p></div>
+                                    <div className="text-center"><p className="text-label-sm text-outline">18:00</p><p className="font-bold text-primary">0.9m</p></div>
+                                    <div className="text-center"><p className="text-label-sm text-outline">21:00</p><p className="font-bold text-primary">0.6m</p></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-lg bg-surface-container-low/50 flex justify-end">
+                            <button onClick={onClose} className="bg-primary text-on-primary px-xl py-sm rounded-full font-label-md shadow-md active:scale-95 transition-all">Entendido</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Page Components ---
+
+        const SpotsPage = () => {
+            const [selectedBeach, setSelectedBeach] = useState(null);
+            const navigate = useNavigate();
+
+            return (
+                <div className="pb-32">
+                    <TopAppBar />
+                    <main className="max-w-[1280px] mx-auto px-container-margin py-lg">
+                        <section className="mb-xl">
+                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-md">
+                                <div>
+                                    <h2 className="font-h1 text-h1 text-primary mb-xs">Playa</h2>
+                                    <p className="font-body-lg text-body-lg text-outline">Selecciona en que playa vamos a nadar</p>
+                                </div>
+                                <div className="flex items-center gap-sm">
+                                    <div className="relative group">
+                                        <input className="bg-surface-container-low border-b-2 border-sky-100 focus:border-primary outline-none px-md py-sm rounded-xl font-body-md w-full md:w-64 transition-all focus:bg-white focus:underwater-shadow" placeholder="Buscar.." type="text" />
+                                        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+                                    </div>
+                                    <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-surface-container-high text-primary hover:bg-sky-50 transition-colors">
+                                        <span className="material-symbols-outlined">filter_list</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+                            {BEACHES.map(beach => (
+                                <article key={beach.id} className="bg-white rounded-[24px] overflow-hidden underwater-shadow group flex flex-col border border-sky-100/50">
+                                    <div className="relative h-64 overflow-hidden">
+                                        <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src={beach.img} />
+                                        <button onClick={() => setSelectedBeach(beach)} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-primary active:scale-90 transition-all">
+                                            <span className="material-symbols-outlined">favorite</span>
+                                        </button>
+                                    </div>
+                                    <div className="p-md flex flex-col flex-1 waterline-accent">
+                                        <div className="flex justify-between items-start mb-sm">
+                                            <h3 className="font-h3 text-h3 text-on-surface">{beach.name}</h3>
+                                            <div className="flex items-center text-secondary font-bold">
+                                                <span className="material-symbols-outlined text-[18px] mr-1">water_drop</span>
+                                                <span className="text-label-md">{beach.temp}</span>
+                                            </div>
+                                        </div>
+                                        <div className="mt-auto flex items-center justify-between gap-sm">
+                                            <button onClick={() => setSelectedBeach(beach)} className="text-primary font-label-md hover:underline active:scale-95 transition-all">Info Olas</button>
+                                            <button onClick={() => navigate('/config')} className="bg-primary hover:bg-primary-container text-on-primary px-xl py-sm rounded-full font-label-md shadow-md active:scale-95 transition-all">Elegir</button>
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    </main>
+                    <ForecastModal isOpen={!!selectedBeach} beach={selectedBeach} onClose={() => setSelectedBeach(null)} />
+                    <button onClick={() => navigate('/config')} className="fixed bottom-24 right-6 md:bottom-12 md:right-12 w-14 h-14 bg-gradient-to-br from-primary to-tertiary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform duration-200 z-40">
+                        <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>add</span>
+                    </button>
+                    <BottomNav />
+                </div>
+            );
+        };
+
+        const ConfigPage = () => {
+            const [distance, setDistance] = useState(3.5);
+            const navigate = useNavigate();
+
+            return (
+                <div className="bg-surface pb-32 min-h-screen">
+                    <TopAppBar title="Configurar Entreno" showBack={true} />
+                    <main className="max-w-2xl mx-auto px-container-margin mt-8 space-y-lg">
+                        <section>
+                            <h2 className="font-h1 text-h1 text-primary mb-xs">Configura tu entreno</h2>
+                            <p className="font-body-md text-body-md text-on-surface-variant">Define los detalles de tu sesión de natación hoy.</p>
+                        </section>
+
+                        <section className="glass-card rounded-xl p-md waterline relative">
+                            <div className="flex justify-between items-end mb-sm">
+                                <div>
+                                    <label className="font-label-sm text-label-sm text-primary uppercase">Distancia estimada</label>
+                                    <p className="font-h2 text-h2 text-on-surface">{distance} km</p>
+                                </div>
+                                <span className="material-symbols-outlined text-primary-container">distance</span>
+                            </div>
+                            <input
+                                className="accent-primary w-full"
+                                max="5" min="1" step="0.5" type="range"
+                                value={distance}
+                                onChange={(e) => setDistance(parseFloat(e.target.value))}
+                            />
+                            <div className="flex justify-between mt-xs font-label-sm text-on-surface-variant">
+                                <span>1km</span><span>2km</span><span>3km</span><span>4km</span><span>5km</span>
+                            </div>
+                        </section>
+
+                        <section className="space-y-sm">
+                            <div className="flex justify-between items-center px-base">
+                                <h3 className="font-h3 text-h3">Asistentes</h3>
+                                <button className="text-primary font-label-md flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-[18px]">person_add</span>
+                                    Agregar
+                                </button>
+                            </div>
+                            <div className="flex flex-wrap gap-sm">
+                                {[1, 2, 3, 4].map(i => (
+                                    <div key={i} className="flex flex-col items-center gap-xs">
+                                        <div className="relative">
+                                            <img alt={`Person ${i}`} className={`w-14 h-14 rounded-full object-cover border-2 ${i === 1 ? 'border-primary' : 'border-transparent'}`} src={`https://i.pravatar.cc/150?u=${i + 10}`} />
+                                            {i === 1 && (
+                                                <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-0.5">
+                                                    <span className="material-symbols-outlined text-[12px]">check_circle</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <span className={`font-label-sm ${i === 1 ? 'text-on-surface' : 'text-on-surface-variant'}`}>Persona {i}</span>
+                                    </div>
+                                ))}
+                                <button className="w-14 h-14 rounded-full border-2 border-dashed border-outline-variant flex items-center justify-center text-outline hover:border-primary hover:text-primary transition-colors">
+                                    <span className="material-symbols-outlined">add</span>
+                                </button>
+                            </div>
+                        </section>
+
+                        <section className="grid grid-cols-2 gap-sm">
+                            <div className="glass-card rounded-xl p-sm space-y-xs">
+                                <label className="font-label-sm text-label-sm text-primary uppercase">Cuando</label>
+                                <div className="flex items-center gap-sm">
+                                    <span className="material-symbols-outlined text-primary">calendar_today</span>
+                                    <span className="font-body-md font-medium">Aug 24, 2024</span>
+                                </div>
+                            </div>
+                            <div className="glass-card rounded-xl p-sm space-y-xs">
+                                <label className="font-label-sm text-label-sm text-primary uppercase">Hora</label>
+                                <div className="flex items-center gap-sm">
+                                    <span className="material-symbols-outlined text-primary">schedule</span>
+                                    <span className="font-body-md font-medium">06:30 AM</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="glass-card rounded-xl overflow-hidden shadow-sm">
+                            <div className="h-32 bg-slate-200 relative">
+                                <img alt="Pool" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChbeHu6pWNIBGasBtAc7y3ozRzlIlcyFHCmW5n-L9OR-XnDFOS7qRfmX1WRNMd5cBAIFj-GNGmSSK-SxLO1UY5mw5GkQH4uM5Qc9TYbTzbauEGPxBm3yUdLc4hMaaNbaGrewU_0seL9c1qZr8XP2ww42xR4nYpO_e63-kKu0TpUgJawBx-izGgmzE5ZWKy3xYAf8zbHVVFkQ6fP9EBChSGvPPX1KnQuiaMKrujB6ReKcWoCW4-DxI4AOZasXA_D7JlQaiRPDOpkdcl" />
+                            </div>
+                            <div className="p-sm flex justify-between items-center">
+                                <div>
+                                    <h4 className="font-label-md text-on-surface">Espai de Mar</h4>
+                                    <p className="font-body-sm text-on-surface-variant">Próxima sesión planificada</p>
+                                </div>
+                                <button className="text-primary-container p-2 rounded-full hover:bg-primary-fixed/30 transition-colors">
+                                    <span className="material-symbols-outlined">map</span>
+                                </button>
+                            </div>
+                        </section>
+
+                        <div className="pt-sm">
+                            <button onClick={() => navigate('/log')} className="w-full bg-gradient-to-r from-primary to-tertiary text-on-primary font-h3 py-md rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-sm">
+                                <span>Guardar </span>
+                                <span className="material-symbols-outlined">event_available</span>
+                            </button>
+                        </div>
+                    </main>
+                    <BottomNav />
+                </div>
+            );
+        };
+
+        const LogPage = () => {
+            const navigate = useNavigate();
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                alert("Resultados guardados exitosamente!");
+                navigate('/');
+            };
+
+            return (
+                <div className="bg-background min-h-screen flex flex-col">
+                    <TopAppBar title="Confirma tus resultados" showBack={true} />
+                    <main className="flex-grow max-w-lg mx-auto w-full px-container-margin py-lg">
+                        <section className="mb-lg">
+                            <h2 className="font-h1 text-h1 text-on-surface mb-xs">Track de tu entreno</h2>
+                            <p className="font-body-md text-on-surface-variant">Completa los datos reales de tu sesión hoy.</p>
+                        </section>
+
+                        <div className="space-y-md">
+                            <div className="glass-card underwater-shadow rounded-xl p-md border border-primary/10 flex items-center justify-between mb-md">
+                                <div className="flex items-center gap-sm">
+                                    <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+                                        <span className="material-symbols-outlined">pool</span>
+                                    </div>
+                                    <div>
+                                        <p className="font-label-sm text-outline uppercase tracking-widest">Entreno de Hoy</p>
+                                        <p className="font-h3 text-h3 text-on-surface">Espai de Mar</p>
+                                    </div>
+                                </div>
+                                <span className="font-label-md text-tertiary-container bg-tertiary-fixed px-3 py-1 rounded-full">Active</span>
+                            </div>
+
+                            <form className="space-y-md" onSubmit={handleSubmit}>
+                                <div className="flex flex-col gap-base">
+                                    <label className="font-label-md text-on-surface-variant px-1" htmlFor="distance">Distancia Real (km)</label>
+                                    <div className="relative">
+                                        <input className="w-full bg-surface-container-lowest border-0 border-b-2 border-primary/20 focus:border-primary focus:ring-0 rounded-t-lg px-md py-4 text-h2 font-h2 text-on-surface transition-all placeholder:text-outline-variant" id="distance" inputmode="decimal" placeholder="0.00" step="0.01" type="number" required />
+                                        <div className="absolute right-md top-1/2 -translate-y-1/2 text-outline font-label-md">KM</div>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col gap-base">
+                                    <label className="font-label-md text-on-surface-variant px-1" htmlFor="time">Tiempo (min)</label>
+                                    <div className="relative">
+                                        <input className="w-full bg-surface-container-lowest border-0 border-b-2 border-primary/20 focus:border-primary focus:ring-0 rounded-t-lg px-md py-4 text-h2 font-h2 text-on-surface transition-all placeholder:text-outline-variant" id="time" inputmode="numeric" placeholder="45" type="number" required />
+                                        <div className="absolute right-md top-1/2 -translate-y-1/2 text-outline font-label-md">MIN</div>
+                                    </div>
+                                </div>
+
+                                <div className="pt-xl pb-md">
+                                    <button className="w-full bg-gradient-to-r from-primary to-tertiary text-on-primary font-h3 text-h3 py-md rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-sm" type="submit">
+                                        <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>save</span>
+                                        Guardar Resultados
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <MemoryRouter>
+                    <Routes>
+                        <Route path="/" element={<SpotsPage />} />
+                        <Route path="/config" element={<ConfigPage />} />
+                        <Route path="/log" element={<LogPage />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        };
+
+        const container = document.getElementById('root');
+        const root = createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
