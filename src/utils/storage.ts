@@ -22,64 +22,15 @@ function jsonToCsv(data: any[]): string {
   return [headers.join(','), ...rows].join('\n');
 }
 
-function csvToJson(csv: string): any[] {
-  if (!csv || csv.trim() === '') return [];
-  const lines = csv.split('\n');
-  const headers = lines[0].split(',');
-  const result: any[] = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-
-    const values: string[] = [];
-    let current = '';
-    let inQuotes = false;
-    for (let j = 0; j < line.length; j++) {
-      const char = line[j];
-      if (char === '"' && line[j + 1] === '"') {
-        current += '"';
-        j++;
-      } else if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        values.push(current);
-        current = '';
-      } else {
-        current += char;
-      }
-    }
-    values.push(current);
-
-    const obj: any = {};
-    headers.forEach((header, idx) => {
-      let val = values[idx];
-      if (!val) {
-        obj[header] = header === 'participants' ? [] : '';
-        return;
-      }
-      
-      // Try to parse JSON objects/arrays
-      if (val.startsWith('{') || val.startsWith('[')) {
-        try {
-          obj[header] = JSON.parse(val.replace(/\\n/g, '\n'));
-        } catch {
-          obj[header] = val;
-        }
-      } else if (!isNaN(Number(val)) && val !== '') {
-        obj[header] = Number(val);
-      } else {
-        obj[header] = val;
-      }
-    });
-    result.push(obj);
-  }
-  return result;
-}
-
 // --- SYNC HELPERS ---
 
 async function saveToFile(type: 'salidas' | 'rutas', data: any[]) {
+  // File saving only works in development with Vite backend
+  // In production (GitHub Pages), data is only persisted via localStorage
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    return; // Skip in production
+  }
+
   try {
     const csv = jsonToCsv(data);
     await fetch(`/api/storage?type=${type}`, {
@@ -87,28 +38,14 @@ async function saveToFile(type: 'salidas' | 'rutas', data: any[]) {
       body: csv,
     });
   } catch (err) {
-    console.error(`Error saving ${type} to file:`, err);
+    console.warn(`Could not save ${type} to file (development feature only):`, err);
   }
 }
 
 export async function initStorage() {
-  try {
-    const sRes = await fetch('/api/storage?type=salidas');
-    const sCsv = await sRes.text();
-    if (sCsv) {
-      const salidas = csvToJson(sCsv);
-      localStorage.setItem(SALIDAS_KEY, JSON.stringify(salidas));
-    }
-
-    const rRes = await fetch('/api/storage?type=rutas');
-    const rCsv = await rRes.text();
-    if (rCsv) {
-      const rutas = csvToJson(rCsv);
-      localStorage.setItem(RUTAS_KEY, JSON.stringify(rutas));
-    }
-  } catch (err) {
-    console.warn('Could not load storage from file, falling back to localStorage only', err);
-  }
+  // Storage is purely localStorage-based in production
+  // The /api/storage endpoints only work in development with Vite
+  console.log('Storage initialized (localStorage only)');
 }
 
 // --- PUBLIC API ---
