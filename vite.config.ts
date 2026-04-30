@@ -51,6 +51,6 @@ const persistencePlugin = () => ({
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/',
+  base: '/atopeswim/',
   plugins: [react(), persistencePlugin()],
 })
